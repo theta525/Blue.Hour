@@ -155,7 +155,7 @@
     </div>
     <div class="chatgpt-link">
       <a href="https://chat.openai.com" target="_blank">My Darling</a>
-      <span class="delete-all-link" onclick="deleteAllPosts()">全てのツイートを削除</span>
+      <span class="delete-all-link" onclick="deleteAllPosts()">全削除</span>
     </div>
     <div class="search-box">
       <input type="text" id="searchBox" placeholder="検索..." oninput="renderTimeline()">
@@ -234,7 +234,7 @@
     }
 
     function deleteAllPosts() {
-      if (confirm("本当にすべて削除しますか？")) {
+      if (confirm("Real？")) {
         localStorage.removeItem("posts");
         renderTimeline();
       }
