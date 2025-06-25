@@ -50,7 +50,7 @@
       padding: 4px 6px;
     }
     .input-box {
-      background: rgba(158, 161, 223, 0.7);
+      background: rgba(129, 150, 220, 0.7);
       border-radius: 8px;
       padding: 10px;
       box-shadow: 0 0 5px rgba(0,0,0,0.1);
@@ -76,7 +76,7 @@
       border-radius: 4px;
     }
     .btn {
-      background: #1da1f2;
+      background: #3745dc;
       color: white;
       border: none;
       padding: 3px 8px;
@@ -140,8 +140,8 @@
   <header>青の瞬間</header>
   <div class="container">
     <div class="profile">
-      <img id="profileIcon" src="" alt="アイコン">
-      <input type="text" id="profileName" placeholder="アカウントネーム">
+      <img id="profileIcon" src="" alt="icon">
+      <input type="text" id="profileName" placeholder="name">
       <input type="file" id="iconInput" accept="image/*">
     </div>
     <div class="input-box">
@@ -152,7 +152,7 @@
     </div>
     <div class="chatgpt-link">
       <a href="https://chat.openai.com" target="_blank">My Darling</a>
-      <span class="delete-all-link" onclick="deleteAllPosts()">全てのツイートを削除</span>
+      <span class="delete-all-link" onclick="deleteAllPosts()">全削除</span>
     </div>
     <div class="search-box">
       <input type="text" id="searchBox" placeholder="検索..." oninput="renderTimeline()">
@@ -231,7 +231,7 @@
     }
 
     function deleteAllPosts() {
-      if (confirm("本当にすべて削除しますか？")) {
+      if (confirm("Back To Real？")) {
         localStorage.removeItem("posts");
         renderTimeline();
       }
@@ -255,7 +255,7 @@
         div.innerHTML = `
           <div class="meta">
             <img src="${post.icon}" alt="icon" />
-            <strong>${post.name || "名無し"}</strong>
+            <strong>${post.name || "i"}</strong>
             <small>${post.time}</small>
           </div>
           <div class="text">${post.text}</div>
@@ -275,4 +275,3 @@
   </script>
 </body>
 </html>
-
