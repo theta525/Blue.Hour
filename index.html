@@ -49,6 +49,10 @@
     .profile input[type="text"] {
       font-size: 0.85em;
       padding: 4px 6px;
+      flex: 1;
+      max-width: 100%;
+      box-sizing: border-box;
+    }
     }
     .input-box {
       background: rgba(104, 133, 230, 0.5);
@@ -60,7 +64,8 @@
       gap: 10px;
     }
     textarea {
-      width: 100%;
+      width: calc(100% - 10px);
+      box-sizing: border-box;
       min-height: 80px;
       resize: vertical;
       font-size: 0.9em;
@@ -112,6 +117,8 @@
     }
     .search-box input {
       background: rgba(104, 133, 230, 0.5);
+      max-width: 100%;
+      box-sizing: border-box;
       color: rgb(135, 138, 199);
       width: 100%;
       padding: 8px;
@@ -143,7 +150,7 @@
   <header>青の瞬間</header>
   <div class="container">
     <div class="profile">
-      <img id="profileIcon" src="" alt="アイコン">
+      <img id="profileIcon" src="" alt="?">
       <input type="text" id="profileName" placeholder="i">
       <input type="file" id="iconInput" accept="image/*">
     </div>
@@ -234,7 +241,7 @@
     }
 
     function deleteAllPosts() {
-      if (confirm("Real？")) {
+      if (confirm("Is reality really there?")) {
         localStorage.removeItem("posts");
         renderTimeline();
       }
