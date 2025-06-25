@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -30,7 +29,7 @@
       display: flex;
       flex-direction: column;
       gap: 15px;
-      max-width: 600px;
+      max-width: 100%;
       margin: 0 auto;
       padding: 10px;
     }
@@ -41,17 +40,17 @@
       margin-bottom: 10px;
     }
     .profile img {
-      width: 36px;
-      height: 36px;
+      width: 30px;
+      height: 30px;
       border-radius: 50%;
       object-fit: cover;
     }
     .profile input[type="text"] {
-      font-size: 0.9em;
+      font-size: 0.85em;
       padding: 4px 6px;
     }
     .input-box {
-      background: rgb(158, 161, 223);
+      background: rgba(158, 161, 223, 0.7);
       border-radius: 8px;
       padding: 10px;
       box-shadow: 0 0 5px rgba(0,0,0,0.1);
@@ -63,7 +62,7 @@
       width: 100%;
       min-height: 80px;
       resize: vertical;
-      font-size: 1em;
+      font-size: 0.9em;
     }
     .images-preview {
       display: flex;
@@ -71,8 +70,8 @@
       gap: 5px;
     }
     .images-preview img {
-      width: 70px;
-      height: 70px;
+      width: 60px;
+      height: 60px;
       object-fit: cover;
       border-radius: 4px;
     }
@@ -80,10 +79,10 @@
       background: #1da1f2;
       color: white;
       border: none;
-      padding: 4px 10px;
+      padding: 3px 8px;
       border-radius: 16px;
       cursor: pointer;
-      font-size: 0.85em;
+      font-size: 0.75em;
     }
     .btn.posting {
       background: black !important;
@@ -94,7 +93,7 @@
       gap: 10px;
     }
     .post {
-      background: rgba(255, 255, 255, 0.8);
+      background: rgba(255, 255, 255, 0.7);
       border-radius: 8px;
       padding: 10px;
       box-shadow: 0 0 5px rgba(0,0,0,0.1);
@@ -205,7 +204,7 @@
     };
 
     function extractTags(text) {
-      return text.match(/#\w+/g) || [];
+      return text.match(/#\\w+/g) || [];
     }
 
     function postTweet() {
@@ -276,3 +275,4 @@
   </script>
 </body>
 </html>
+
