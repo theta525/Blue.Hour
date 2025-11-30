@@ -1,15 +1,80 @@
-{
-  "name": "青の瞬間",
-  "short_name": "青メモ",
-  "start_url": "./index.html",
-  "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#1da1f2",
-  "icons": [
-    {
-      "src": "icon.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    }
-  ]
+body {
+  font-family: system-ui, sans-serif;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+header {
+  background: #0f172a;
+  color: white;
+  padding: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.controls input { padding: 6px; width: 200px; }
+.controls button { padding: 6px 10px; margin-left: 8px; }
+
+main {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+#sidebar {
+  width: 180px;
+  border-right: 1px solid #ddd;
+  padding: 12px;
+  overflow: auto;
+}
+
+#noteArea {
+  flex: 1;
+  padding: 12px;
+  overflow: auto;
+}
+
+#noteList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.note-card {
+  width: 220px;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background: white;
+  cursor: pointer;
+}
+
+.note-card.pinned {
+  border-color: gold;
+}
+
+#editor {
+  border: 1px solid #ccc;
+  padding: 12px;
+  border-radius: 6px;
+  background: #fafafa;
+  margin-top: 16px;
+}
+
+.hidden { display: none; }
+
+textarea {
+  width: 100%;
+  height: 160px;
+  margin-bottom: 8px;
+}
+
+button.danger {
+  background: #ff6b6b;
+  border: none;
+  color: white;
+  padding: 6px 10px;
 }
