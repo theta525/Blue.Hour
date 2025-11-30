@@ -1,0 +1,187 @@
+// ========== IndexedDB セットアップ ==========
+let db;
+const DB_NAME = "seeklogDB";
+const STORE = "notes";
+
+const req = indexedDB.open(DB_NAME, 1);
+
+req.onupgradeneeded = (e) => {
+  db = e.target.result;
+  const store = db.createObjectStore(STORE, { keyPath: "id", autoIncrement: true });
+  store.createIndex("tags", "tags", { multiEntry: true });
+  store.createIndex("pinned", "pinned");
+};
+
+req.onsuccess = (e) => {
+  db = e.target.result;
+  loadNotes();
+};
+
+req.onerror = (e) => {
+  alert("IndexedDB が使えません");
+};
+
+
+// ========== 共通関数 ==========
+function tx(mode = "readonly") {
+  return db.transaction([STORE], mode).objectStore(STORE);
+}
+
+function getAllNotes() {
+  return new Promise((resolve) => {
+    const notes = [];
+    const cursor = tx().openCursor();
+    cursor.onsuccess = (e) => {
+      const c = e.target.result;
+      if (c) {
+        notes.push(c.value);
+        c.continue();
+      } else resolve(notes);
+    };
+  });
+}
+
+
+// ========== レンダリング ==========
+async function loadNotes(query = "", tagFilter = "") {
+  let notes = await getAllNotes();
+
+  if (query) {
+    notes = notes.filter(n =>
+      n.title.includes(query) || n.content.includes(query)
+    );
+  }
+
+  if (tagFilter) {
+    notes = notes.filter(n => n.tags.includes(tagFilter));
+  }
+
+  notes.sort((a, b) => {
+    if (a.pinned !== b.pinned) return b.pinned - a.pinned;
+    return b.updated - a.updated;
+  });
+
+  renderNotes(notes);
+  renderTags(notes);
+}
+
+function renderNotes(notes) {
+  const list = document.getElementById("noteList");
+  list.innerHTML = "";
+
+  notes.forEach(n => {
+    const card = document.createElement("div");
+    card.className = "note-card" + (n.pinned ? " pinned" : "");
+    card.dataset.id = n.id;
+
+    card.innerHTML = `
+      <h4>${n.title || "(無題)"}</h4>
+      <p>${(n.content || "").slice(0, 120)}</p>
+      <div>${n.tags.map(t => "#" + t).join(" ")}</div>
+    `;
+
+    card.addEventListener("click", () => openEditor(n));
+    list.appendChild(card);
+  });
+}
+
+function renderTags(notes) {
+  const tagSet = new Set();
+  notes.forEach(n => n.tags.forEach(t => tagSet.add(t)));
+
+  const ul = document.getElementById("tagList");
+  ul.innerHTML = "";
+
+  [...tagSet].sort().forEach(t => {
+    const li = document.createElement("li");
+    const btn = document.createElement("button");
+    btn.textContent = t;
+    btn.onclick = () => loadNotes("", t);
+    li.appendChild(btn);
+    ul.appendChild(li);
+  });
+}
+
+
+// ========== エディタ ==========
+function openEditor(note = null) {
+  const editor = document.getElementById("editor");
+  editor.classList.remove("hidden");
+
+  if (note) {
+    editingId = note.id;
+    document.getElementById("noteTitle").value = note.title;
+    document.getElementById("noteContent").value = note.content;
+    document.getElementById("noteTags").value = note.tags.join(",");
+    document.getElementById("notePinned").checked = note.pinned;
+  } else {
+    editingId = null;
+    document.getElementById("noteTitle").value = "";
+    document.getElementById("noteContent").value = "";
+    document.getElementById("noteTags").value = "";
+    document.getElementById("notePinned").checked = false;
+  }
+}
+
+function closeEditor() {
+  document.getElementById("editor").classList.add("hidden");
+}
+
+let editingId = null;
+
+document.getElementById("saveBtn").onclick = () => {
+  const title = document.getElementById("noteTitle").value;
+  const content = document.getElementById("noteContent").value;
+  const tags = document.getElementById("noteTags").value
+    .split(",")
+    .map(s => s.trim())
+    .filter(Boolean);
+  const pinned = document.getElementById("notePinned").checked;
+
+  const store = tx("readwrite");
+
+  const data = {
+    title,
+    content,
+    tags,
+    pinned,
+    updated: Date.now()
+  };
+
+  if (editingId) {
+    data.id = editingId;
+    store.put(data);
+  } else {
+    store.add(data);
+  }
+
+  store.transaction.oncomplete = () => {
+    closeEditor();
+    loadNotes();
+  };
+};
+
+document.getElementById("deleteBtn").onclick = () => {
+  if (!editingId) return;
+  if (!confirm("削除して大丈夫？")) return;
+
+  const store = tx("readwrite");
+  store.delete(editingId);
+
+  store.transaction.oncomplete = () => {
+    closeEditor();
+    loadNotes();
+  };
+};
+
+document.getElementById("cancelBtn").onclick = closeEditor;
+
+
+// ========== 検索 ==========
+document.getElementById("search").oninput = (e) => {
+  loadNotes(e.target.value);
+};
+
+
+// ========== 新規 ==========
+document.getElementById("newBtn").onclick = () => openEditor(null);
