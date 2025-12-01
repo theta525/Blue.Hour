@@ -1,85 +1,42 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>シークログ風メモ</title>
-  <link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>メモアプリ</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header id="appHeader">
-    <div class="header-left">
-      <div id="profileArea" class="profile-area">
-        <img id="profileIcon" alt="icon" />
-        <div id="profileName"></div>
-      </div>
-      <div class="title-area">
-        <h1>シークログ</h1>
-        <div class="sub">軽量メモ · オフライン · タグタブ</div>
-      </div>
+
+    <div class="tabs">
+        <button id="tab-post" class="active" onclick="showView('post')">投稿</button>
+        <button id="tab-posts" onclick="showView('posts')">一覧</button>
+        <button id="tab-settings" onclick="showView('settings')">設定</button>
     </div>
 
-    <div class="header-right">
-      <input id="search" placeholder="検索" />
-      <button id="newBtn">新規</button>
-      <button id="openProfileBtn" title="プロフィール設定">設定</button>
+    <!-- 投稿画面 -->
+    <div id="view-post" class="view active">
+        <h2>新規投稿</h2>
+        <textarea id="postInput" placeholder="ここに投稿内容を書く"></textarea>
+        <button id="postBtn">投稿する</button>
     </div>
-  </header>
 
-  <nav id="tagTabs" class="tag-tabs"></nav>
-
-  <main>
-    <section id="noteArea">
-      <div id="noteList" class="note-list"></div>
-
-      <div id="editor" class="editor hidden" role="dialog" aria-hidden="true">
-        <div class="editor-top">
-          <input id="noteTitle" placeholder="タイトル" />
-          <label class="pin"><input type="checkbox" id="notePinned" /> ピン</label>
-        </div>
-        <textarea id="noteContent" placeholder="本文"></textarea>
-        <input id="noteTags" placeholder="タグ（カンマ区切り）" />
-        <div class="editor-actions">
-          <button id="saveBtn">保存</button>
-          <button id="cancelBtn">キャンセル</button>
-          <button id="deleteBtn" class="danger">削除</button>
-        </div>
-      </div>
-    </section>
-
-    <aside id="side">
-      <div class="panel">
-        <h3>テーマ</h3>
-        <input type="file" id="themeInput" accept="image/*" />
-        <button id="clearTheme">テーマクリア</button>
-      </div>
-
-      <div class="panel">
-        <h3>タグ一覧</h3>
-        <div id="tagList" class="tag-list"></div>
-      </div>
-
-      <div class="panel">
-        <h3>エクスポート / インポート</h3>
-        <button id="exportBtn">JSON エクスポート</button>
-        <input type="file" id="importInput" accept="application/json" />
-      </div>
-    </aside>
-  </main>
-
-  <!-- プロフィールモーダル -->
-  <div id="profileModal" class="modal hidden" role="dialog" aria-hidden="true">
-    <div class="modal-content">
-      <h2>プロフィール設定</h2>
-      <label>名前<input id="profileNameInput" placeholder="表示名" /></label>
-      <label>アイコン（画像）<input type="file" id="profileIconInput" accept="image/*" /></label>
-      <div class="modal-actions">
-        <button id="saveProfile">保存</button>
-        <button id="closeProfile">閉じる</button>
-      </div>
+    <!-- 投稿一覧 -->
+    <div id="view-posts" class="view">
+        <h2>投稿一覧</h2>
+        <div id="postList"></div>
     </div>
-  </div>
 
-  <script src="app.js"></script>
+    <!-- 設定 -->
+    <div id="view-settings" class="view">
+        <h2>設定</h2>
+        <p>テーマ</p>
+        <select id="theme">
+            <option value="light">ライト</option>
+            <option value="dark">ダーク</option>
+        </select>
+    </div>
+
+    <script src="app.js"></script>
 </body>
 </html>
