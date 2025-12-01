@@ -1,42 +1,247 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>メモアプリ</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>掲示板風メモ</title>
+  <meta name="description" content="シンプルな掲示板風のメモ UI ローカル画像アイコン対応 iPhone13 mini 対応">
+  <style>
+    :root{
+      --bg:#071229; --card:#0b1630; --muted:#9fb0c8; --accent1:#6fb3ff; --accent2:#ff8fc1; --glass:rgba(255,255,255,0.03)
+    }
+    html,body{height:100%;margin:0;font-family:Inter, 'Yu Gothic', 'Hiragino Kaku Gothic ProN', Meiryo, sans-serif;background:linear-gradient(180deg,var(--bg) 0%,#021026 100%);color:#eaf4ff}
+    .container{max-width:780px;margin:18px auto;padding:16px}
+    header{display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .title{font-size:20px;font-weight:800}
+    .subtitle{font-size:12px;color:var(--muted)}
+    .panel{background:linear-gradient(180deg,var(--card),rgba(6,13,30,0.9));border-radius:14px;padding:14px;margin-top:12px;box-shadow:0 8px 24px rgba(0,0,0,0.6)}
+    .form-row{display:flex;gap:10px;align-items:flex-start}
+    .col{flex:1}
+    label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}
+    input[type=text],textarea,select{width:100%;padding:10px;border-radius:10px;background:var(--glass);border:1px solid rgba(255,255,255,0.04);color:inherit;box-sizing:border-box}
+    textarea{min-height:110px;resize:vertical}
+    .controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+    .btn{padding:10px 12px;border-radius:10px;border:none;font-weight:700;cursor:pointer;background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#041224}
+    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted)}
+    .search-area{margin-top:12px}
+    .link{display:block;margin-top:8px;font-size:13px;color:var(--accent1);text-decoration:underline}
+    .posts{margin-top:14px;display:flex;flex-direction:column;gap:10px}
+    .post{display:flex;gap:10px;padding:12px;border-radius:10px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.02)}
+    .avatar{width:56px;height:56px;border-radius:10px;object-fit:cover;background:linear-gradient(180deg,#0a1220,#071029);flex-shrink:0}
+    .post-body{flex:1}
+    .meta{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+    .name{font-weight:700}
+    .time{font-size:12px;color:var(--muted)}
+    .text{white-space:pre-wrap;line-height:1.6}
+    .post-actions{display:flex;flex-direction:column;gap:8px;align-items:flex-end}
+    .small{font-size:12px;color:var(--muted)}
+    footer{margin-top:18px;text-align:center;color:var(--muted);font-size:13px}
+    /* iPhone 13 mini に合わせた狭い画面対応  */
+    @media(max-width:420px){
+      .container{padding:10px;margin:6px auto}
+      .avatar{width:48px;height:48px}
+      .title{font-size:18px}
+      .form-row{flex-direction:column}
+      .controls{justify-content:space-between}
+      .btn{flex:1}
+      .post{padding:10px}
+    }
+  </style>
 </head>
 <body>
+  <div class="container">
+    <header>
+      <div>
+        <div class="title">掲示板風メモ</div>
+        <div class="subtitle">軽いメモや短い投稿に使えるシンプルUI</div>
+      </div>
+      <div class="small">ローカル画像アイコン対応</div>
+    </header>
 
-    <div class="tabs">
-        <button id="tab-post" class="active" onclick="showView('post')">投稿</button>
-        <button id="tab-posts" onclick="showView('posts')">一覧</button>
-        <button id="tab-settings" onclick="showView('settings')">設定</button>
+    <div class="search-area panel">
+      <label for="search">検索</label>
+      <input id="search" type="text" placeholder="キーワードで投稿を検索">
+      <a id="chatgpt-link" class="link" href="https://chat.openai.com" target="_blank" rel="noopener">ChatGPT を開く</a>
     </div>
 
-    <!-- 投稿画面 -->
-    <div id="view-post" class="view active">
-        <h2>新規投稿</h2>
-        <textarea id="postInput" placeholder="ここに投稿内容を書く"></textarea>
-        <button id="postBtn">投稿する</button>
-    </div>
+    <section class="panel" style="margin-top:12px">
+      <div style="display:flex;gap:12px;align-items:center;margin-bottom:8px">
+        <div style="width:64px">
+          <img id="previewAvatar" class="avatar" src="/images/avatars/default.png" alt="avatar">
+        </div>
+        <div style="flex:1">
+          <label for="username">ユーザーネーム</label>
+          <input id="username" type="text" placeholder="名前を入力 例 るな">
+        </div>
+      </div>
 
-    <!-- 投稿一覧 -->
-    <div id="view-posts" class="view">
-        <h2>投稿一覧</h2>
-        <div id="postList"></div>
-    </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+        <div style="flex:1;min-width:180px">
+          <label for="avatarSelect">プロジェクト内のアイコンを選ぶ</label>
+          <select id="avatarSelect">
+            <option value="/images/avatars/default.png">default.png</option>
+            <option value="/images/avatars/avatar1.png">avatar1.png</option>
+            <option value="/images/avatars/avatar2.png">avatar2.png</option>
+            <option value="/images/avatars/avatar3.png">avatar3.png</option>
+          </select>
+        </div>
+        <div style="flex:1;min-width:180px">
+          <label for="avatarFile">手元の画像を使う</label>
+          <input id="avatarFile" type="file" accept="image/*">
+        </div>
+      </div>
 
-    <!-- 設定 -->
-    <div id="view-settings" class="view">
-        <h2>設定</h2>
-        <p>テーマ</p>
-        <select id="theme">
-            <option value="light">ライト</option>
-            <option value="dark">ダーク</option>
-        </select>
-    </div>
+      <label for="content">投稿内容</label>
+      <textarea id="content" placeholder="ここにメモを書いてください"></textarea>
 
-    <script src="app.js"></script>
+      <div class="controls">
+        <button id="postBtn" class="btn">投稿する</button>
+        <button id="clearBtn" class="btn ghost">下書きをクリア</button>
+      </div>
+    </section>
+
+    <section class="posts" id="posts"></section>
+
+    <footer>
+      保存は自動でローカルストレージに行われます サーバー連携はコメントを参照
+    </footer>
+  </div>
+
+  <script>
+    // 簡易掲示板ロジック
+    // posts は localStorage に保存されるフォーマット {id, name, avatar, content, time}
+
+    const usernameEl = document.getElementById('username')
+    const contentEl = document.getElementById('content')
+    const postBtn = document.getElementById('postBtn')
+    const postsEl = document.getElementById('posts')
+    const avatarSelect = document.getElementById('avatarSelect')
+    const avatarFile = document.getElementById('avatarFile')
+    const previewAvatar = document.getElementById('previewAvatar')
+    const clearBtn = document.getElementById('clearBtn')
+    const searchEl = document.getElementById('search')
+
+    const STORAGE_KEY = 'simple_board_posts_v1'
+
+    function loadPosts(){
+      try{
+        const raw = localStorage.getItem(STORAGE_KEY)
+        return raw ? JSON.parse(raw) : []
+      }catch(e){
+        return []
+      }
+    }
+
+    function savePosts(list){
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(list))
+    }
+
+    function renderPosts(filter){
+      const list = loadPosts()
+      postsEl.innerHTML = ''
+      const filtered = filter ? list.filter(p => p.content.includes(filter) || p.name.includes(filter)) : list
+      if(filtered.length === 0){
+        postsEl.innerHTML = '<div class="panel" style="text-align:center;color:var(--muted)">まだ投稿がありません</div>'
+        return
+      }
+      filtered.slice().reverse().forEach(p => {
+        const node = document.createElement('div')
+        node.className = 'post'
+        node.innerHTML = `
+          <img class="avatar" src="${escapeHtml(p.avatar)}" alt="avatar">
+          <div class="post-body">
+            <div class="meta"><div class="name">${escapeHtml(p.name)}</div><div class="time">${escapeHtml(p.time)}</div></div>
+            <div class="text">${escapeHtml(p.content)}</div>
+          </div>
+          <div class="post-actions">
+            <button class="btn ghost" data-id="${p.id}">削除</button>
+          </div>
+        `
+        postsEl.appendChild(node)
+      })
+    }
+
+    function escapeHtml(str){
+      if(!str) return ''
+      return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\"/g,'&quot;').replace(/\'/g,'&#39;')
+    }
+
+    function makeId(){
+      return Date.now().toString(36) + Math.random().toString(36).slice(2,8)
+    }
+
+    postBtn.addEventListener('click', ()=>{
+      const name = usernameEl.value.trim() || '名無し'
+      const content = contentEl.value.trim()
+      if(!content){
+        alert('投稿内容を入力してください')
+        return
+      }
+      const avatar = previewAvatar.src || '/images/avatars/default.png'
+      const posts = loadPosts()
+      const item = {id: makeId(), name, avatar, content, time: new Date().toLocaleString()}
+      posts.push(item)
+      savePosts(posts)
+      contentEl.value = ''
+      renderPosts(searchEl.value.trim())
+      // ここにサーバー送信処理を追加できます 例 fetch('/api/posts',{method:'POST',body:JSON.stringify(item)})
+    })
+
+    clearBtn.addEventListener('click', ()=>{
+      contentEl.value = ''
+    })
+
+    // 削除ボタン処理 イベント委譲
+    postsEl.addEventListener('click', (e)=>{
+      const btn = e.target.closest('button')
+      if(!btn) return
+      const id = btn.getAttribute('data-id')
+      if(!id) return
+      if(!confirm('この投稿を削除しますか')) return
+      const list = loadPosts().filter(p => p.id !== id)
+      savePosts(list)
+      renderPosts(searchEl.value.trim())
+      // ここにサーバー削除処理を追加できます 例 fetch(`/api/posts/${id}`,{method:'DELETE'})
+    })
+
+    // アバター選択とファイルプレビュー
+    avatarSelect.addEventListener('change', ()=>{
+      const v = avatarSelect.value
+      previewAvatar.src = v
+    })
+    avatarFile.addEventListener('change', ()=>{
+      const f = avatarFile.files && avatarFile.files[0]
+      if(!f) return
+      const reader = new FileReader()
+      reader.onload = ()=>{
+        previewAvatar.src = reader.result
+      }
+      reader.readAsDataURL(f)
+    })
+
+    // 検索
+    searchEl.addEventListener('input', ()=>{
+      renderPosts(searchEl.value.trim())
+    })
+
+    // 初期表示
+    window.addEventListener('load', ()=>{
+      // デフォルトアイコンがサーバー上にあることを想定します
+      previewAvatar.src = avatarSelect.value
+      renderPosts()
+    })
+
+    // 便利なキーバインド Ctrl Enter で投稿
+    contentEl.addEventListener('keydown', (e)=>{
+      if(e.key === 'Enter' && (e.ctrlKey || e.metaKey)){
+        postBtn.click()
+      }
+    })
+  </script>
+
+  <!-- 使用上のメモ
+    プロジェクト内のアイコンを使う場合は public/images/avatars フォルダに default.png avatar1.png avatar2.png avatar3.png を置いてください
+    サーバー連携したい場合は post 時と削除時のコメント部分に fetch を追加してください
+  -->
 </body>
 </html>
